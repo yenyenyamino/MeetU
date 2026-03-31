@@ -312,37 +312,37 @@
     </main>
 
     <script>
-        // 音樂開關與本地音軌載入邏輯
+// 音樂開關邏輯
         const bgm = document.getElementById('ambient-bgm');
         const bgmBtn = document.getElementById('bgm-btn');
-        const audioUpload = document.getElementById('audio-upload');
-        const uploadLabel = document.getElementById('upload-label');
-
-        audioUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const objectURL = URL.createObjectURL(file);
-                bgm.src = objectURL;
-                bgm.play().then(() => {
-                    bgmBtn.style.display = 'block';
-                    bgmBtn.textContent = 'Sound On';
-                    bgmBtn.classList.add('playing');
-                    uploadLabel.textContent = '更換曲目';
-                }).catch(err => {
-                    console.error("音樂播放遭遇了些許阻礙：", err);
-                });
-            }
-        });
+        let playPromise;
 
         bgmBtn.addEventListener('click', () => {
             if (bgm.paused) {
-                bgm.play();
-                bgmBtn.textContent = 'Sound On';
-                bgmBtn.classList.add('playing');
+                playPromise = bgm.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        bgmBtn.textContent = 'Sound On';
+                        bgmBtn.classList.add('playing');
+                    }).catch(err => {
+                        console.error("音樂播放遭遇阻礙，請確認 寓見OP.mp3 檔案是否已上傳：", err);
+                        bgmBtn.textContent = '等待音檔中';
+                    });
+                }
             } else {
-                bgm.pause();
-                bgmBtn.textContent = 'Sound Off';
-                bgmBtn.classList.remove('playing');
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        bgm.pause();
+                        bgmBtn.textContent = 'Sound Off';
+                        bgmBtn.classList.remove('playing');
+                    }).catch(error => {
+                        // 吞下那些無意義的系統報錯
+                    });
+                } else {
+                    bgm.pause();
+                    bgmBtn.textContent = 'Sound Off';
+                    bgmBtn.classList.remove('playing');
+                }
             }
         });
 
@@ -355,15 +355,12 @@
             btnExport.textContent = '沖洗中...';
             
             try {
-                // 暫時將控制面板隱入黑暗，確保輸出的影像純粹無干擾
                 uiControls.style.opacity = '0';
-                
-                // 給予一點微小的時間讓透明度動畫完成
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
                 const canvas = await html2canvas(document.body, {
-                    scale: 2, // 提升畫質精度
-                    useCORS: true, // 確保你上傳的跨域圖片能被正確繪製
+                    scale: 2, 
+                    useCORS: true, 
                     backgroundColor: '#050505',
                     logging: false
                 });
@@ -376,7 +373,6 @@
             } catch (error) {
                 console.error("影像定格遭遇了些許阻礙：", error);
             } finally {
-                // 影像沖洗完畢，喚回控制面板
                 uiControls.style.opacity = '1';
                 btnExport.textContent = originalText;
             }
