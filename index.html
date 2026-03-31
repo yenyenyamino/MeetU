@@ -217,15 +217,7 @@
 <body>
 
     <div class="film-grain"></div>
-
-    <!-- 音樂播放器與自訂音軌載入 -->
-    <div class="audio-controls" id="ui-controls">
-        <input type="file" id="audio-upload" accept="audio/*" style="display: none;">
-        <label for="audio-upload" class="bgm-toggle" id="upload-label">載入曲目</label>
-        <button id="bgm-btn" class="bgm-toggle" style="display: none;">Sound Off</button>
-        <button id="btn-export" class="bgm-toggle">捕捉此刻</button>
-        <audio id="ambient-bgm" loop></audio>
-    </div>
+  
 
     <header class="header-section">
         <h1 class="main-title">寓見</h1>
@@ -315,68 +307,23 @@
 // 音樂開關邏輯
         const bgm = document.getElementById('ambient-bgm');
         const bgmBtn = document.getElementById('bgm-btn');
-        let playPromise;
 
-        bgmBtn.addEventListener('click', () => {
-            if (bgm.paused) {
-                playPromise = bgm.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        bgmBtn.textContent = 'Sound On';
-                        bgmBtn.classList.add('playing');
-                    }).catch(err => {
-                        console.error("音樂播放遭遇阻礙，請確認 寓見OP.mp3 檔案是否已上傳：", err);
-                        bgmBtn.textContent = '等待音檔中';
-                    });
-                }
-            } else {
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        bgm.pause();
-                        bgmBtn.textContent = 'Sound Off';
-                        bgmBtn.classList.remove('playing');
-                    }).catch(error => {
-                        // 吞下那些無意義的系統報錯
-                    });
+        bgmBtn.addEventListener('click', async () => {
+            try {
+                if (bgm.paused) {
+                    bgmBtn.textContent = '載入中...';
+                    await bgm.play();
+                    bgmBtn.textContent = 'Sound On';
+                    bgmBtn.classList.add('playing');
                 } else {
                     bgm.pause();
                     bgmBtn.textContent = 'Sound Off';
                     bgmBtn.classList.remove('playing');
                 }
+            } catch (err) {
+                console.error("音樂播放遭遇阻礙：", err);
+                bgmBtn.textContent = '無法讀取音檔';
             }
         });
-
-        // 影像定格輸出邏輯
-        const btnExport = document.getElementById('btn-export');
-        const uiControls = document.getElementById('ui-controls');
-
-        btnExport.addEventListener('click', async () => {
-            const originalText = btnExport.textContent;
-            btnExport.textContent = '沖洗中...';
-            
-            try {
-                uiControls.style.opacity = '0';
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                const canvas = await html2canvas(document.body, {
-                    scale: 2, 
-                    useCORS: true, 
-                    backgroundColor: '#050505',
-                    logging: false
-                });
-                
-                const image = canvas.toDataURL("image/png");
-                const link = document.createElement('a');
-                link.download = 'Symbiosis_Apartment_Teaser.png';
-                link.href = image;
-                link.click();
-            } catch (error) {
-                console.error("影像定格遭遇了些許阻礙：", error);
-            } finally {
-                uiControls.style.opacity = '1';
-                btnExport.textContent = originalText;
-            }
-        });
-    </script>
 </body>
 </html>
