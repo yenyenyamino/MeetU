@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寓見</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@300;400;500;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --text-light: #ececec;
+            --accent-gold: #c2b8a3;
+            --window-frame: #111111;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-light);
+            font-family: 'Noto Serif TC', serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* 電影級底片噪點 */
+        .film-grain {
+            position: fixed;
+            inset: 0;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/cOM2AAAACHRSTlMAMwA0ADMAMwD/J/EAAAAySURBVDjLY2AYBaNgFIyCUcDAwMAQEBDAwMTEtWrVqjWMR2HWAQyDBQYnBgwzWDBiAAQAhJ4Jj6zD/QAAAABJRU5ErkJggg==');
+            background-size: 80px 80px;
+            opacity: 0.12;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* 頂部預告標題 */
+        .header-section {
+            padding: 8vh 5vw 4vh;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: 0.8em;
+            margin-bottom: 1.5rem;
+            text-indent: 0.8em;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .sub-title {
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            color: #888;
+            line-height: 2.5;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 六個並排的狹長直排窗戶 */
+        .apartment-grid {
+            display: flex;
+            flex-direction: row;
+            gap: 4px; /* 窗框的縫隙 */
+            padding: 0 4vw 8vh;
+            max-width: 1800px; /* 放寬總寬度容納六個直排 */
+            margin: 0 auto;
+            width: 100%;
+            height: 75vh; /* 拉出直排的修長感 */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 單一房間設定：預設狹長，懸停時展開 */
+        .room {
+            position: relative;
+            background-color: var(--window-frame);
+            overflow: hidden;
+            cursor: pointer;
+            flex: 1; /* 預設均分狹窄寬度 */
+            transition: flex 0.7s cubic-bezier(0.25, 1, 0.5, 1); /* 平滑的展開呼吸感 */
+        }
+
+        /* 角色影像 (這裡使用 Unsplash 佔位圖，請琰替換為你上傳的六張圖片路徑) */
+        .room-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            /* 預設狀態：抽走色彩，壓暗亮度，呈現深夜未開燈的寂靜感 */
+            filter: grayscale(30%) brightness(0.3) contrast(1.1);
+            transition: all 0.9s cubic-bezier(0.15, 0, 0.2, 1);
+            transform: scale(1);
+        }
+
+        /* 房號浮水印 */
+        .room-number {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            writing-mode: vertical-rl; /* 轉為直排，適應狹長的初始寬度 */
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.6s ease;
+            z-index: 20;
+            mix-blend-mode: difference;
+        }
+
+        /* 角色獨白與資訊遮罩 */
+        .room-content {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 5, 5, 0.95) 0%, rgba(5, 5, 5, 0.4) 40%, transparent 100%);
+            padding: 35px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            opacity: 0; /* 預設隱藏 */
+            transform: translateY(15px);
+            transition: all 0.7s cubic-bezier(0.2, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .char-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: #fff;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+            width: fit-content;
+        }
+
+        .char-quote {
+            font-size: 0.8rem;
+            line-height: 2.2;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.75);
+            font-style: italic;
+        }
+
+        /* === 互動：點亮與展開房間 (Hover 效果) === */
+        .room:hover {
+            flex: 3.5; /* 當視線停留時，該房間的空間會緩緩擴展 */
+        }
+
+        .room:hover .room-bg {
+            /* 恢復色彩，微微放大，像是在黑暗中看清了細節 */
+            filter: grayscale(15%) brightness(0.85) contrast(1.1);
+            transform: scale(1.04);
+        }
+
+        .room:hover .room-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .room:hover .room-number {
+            color: var(--accent-gold);
+        }
+
+        /* === 音樂控制開關 === */
+        .audio-controls {
+            position: fixed;
+            top: 40px;
+            right: 5vw;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+            align-items: center;
+            transition: opacity 0.5s ease; /* 增加透明度過場，讓截圖時能優雅隱藏 */
+        }
+
+        .bgm-toggle {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.3);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .bgm-toggle:hover, .bgm-toggle.playing {
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(194, 184, 163, 0.3);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 1024px) {
+            .apartment-grid {
+                flex-direction: column; /* 螢幕較小時改為上下堆疊的橫向切片 */
+                height: 150vh;
+            }
+            .room-number {
+                writing-mode: horizontal-tb; /* 恢復橫排 */
+                top: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="film-grain"></div>
+
+    <!-- 音樂播放器與自訂音軌載入 -->
+    <div class="audio-controls" id="ui-controls">
+        <input type="file" id="audio-upload" accept="audio/*" style="display: none;">
+        <label for="audio-upload" class="bgm-toggle" id="upload-label">載入曲目</label>
+        <button id="bgm-btn" class="bgm-toggle" style="display: none;">Sound Off</button>
+        <button id="btn-export" class="bgm-toggle">捕捉此刻</button>
+        <audio id="ambient-bgm" loop></audio>
+    </div>
+
+    <header class="header-section">
+        <h1 class="main-title">寓見</h1>
+        <p class="sub-title">
+            六個迴異的靈魂，<br>
+            他們共用著這座公寓，各自又有那些故事。
+        </p>
+    </header>
+
+    <main class="apartment-grid">
+
+        <!-- ROOM 101：黑框眼鏡、拿著相機的男子 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/3aODbSLfkqKLjnm4nPGgQo.png ');"></div>
+            <div class="room-number">ROOM 101</div>
+            <div class="room-content">
+                <h2 class="char-name">目黑 曉</h2>
+                <p class="char-quote">
+                    「我習慣透過觀景窗去凝視這座城市，保持著絕對安全的距離。而你...又如何確認眼下所看到的，是真實的呢？」
+                </p>
+            </div>
+        </article>
+        <!-- ROOM 103：白髮紅眼、拿著咖啡的男子 -->
+        <!-- 琰，請將背景圖替換為你上傳的第一張圖片路徑 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/3NATsvbOzJ7y7KYJyEbXVZ.png');"></div>
+            <div class="room-number">ROOM 103</div>
+            <div class="room-content">
+                <h2 class="char-name">樸織幬</h2>
+                <p class="char-quote">
+                    「好吧，別找了... 大概又弄丟了，或者、根本一開始就沒在那。」
+                </p>
+            </div>
+        </article>
+
+        <!-- ROOM 201：金線白衣、傳統裝扮的男子 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/3BkZgLHp8G2foqgtCEJ9gH.png');"></div>
+            <div class="room-number">ROOM 201</div>
+            <div class="room-content">
+                <h2 class="char-name">御子柴 凜</h2>
+                <p class="char-quote">
+                    「閉上你的嘴，滾開。」
+                </p>
+            </div>
+        </article>
+
+        <!-- ROOM 301：白西裝、被紅白繁花簇擁的男子 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/4TMKA8EBGz6NCdHzSgOIu7.png');"></div>
+            <div class="room-number">ROOM 301</div>
+            <div class="room-content">
+                <h2 class="char-name">Sill</h2>
+                <p class="char-quote">
+                    「...關於這個問題，我會建議你找房東。」
+                </p>
+            </div>
+        </article>
+
+        <!-- ROOM 302：黑髮仰望、煙霧繚繞的男子 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/3lt7RfIoggQfpe712GDk9h.png'); background-position: center 20%;"></div>
+            <div class="room-number">ROOM 302</div>
+            <div class="room-content">
+                <h2 class="char-name">斐明</h2>
+                <p class="char-quote">
+                    「... ...」(時差斷線中)
+                </p>
+            </div>
+        </article>
+
+        <!-- ROOM 403：粉色亂髮、隨性坐在地上的男子 -->
+        <article class="room">
+            <div class="room-bg" style="background-image: url('https://images.plurk.com/5SkR2IpKwadeGPtUMbHyCH.png');"></div>
+            <div class="room-number">ROOM 403</div>
+            <div class="room-content">
+                <h2 class="char-name">楠朔</h2>
+                <p class="char-quote">
+                    「嗚呼！這好好吃－－」
+                </p>
+            </div>
+        </article>
+
+    </main>
+
+    <script>
+        // 音樂開關與本地音軌載入邏輯
+        const bgm = document.getElementById('ambient-bgm');
+        const bgmBtn = document.getElementById('bgm-btn');
+        const audioUpload = document.getElementById('audio-upload');
+        const uploadLabel = document.getElementById('upload-label');
+
+        audioUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const objectURL = URL.createObjectURL(file);
+                bgm.src = objectURL;
+                bgm.play().then(() => {
+                    bgmBtn.style.display = 'block';
+                    bgmBtn.textContent = 'Sound On';
+                    bgmBtn.classList.add('playing');
+                    uploadLabel.textContent = '更換曲目';
+                }).catch(err => {
+                    console.error("音樂播放遭遇了些許阻礙：", err);
+                });
+            }
+        });
+
+        bgmBtn.addEventListener('click', () => {
+            if (bgm.paused) {
+                bgm.play();
+                bgmBtn.textContent = 'Sound On';
+                bgmBtn.classList.add('playing');
+            } else {
+                bgm.pause();
+                bgmBtn.textContent = 'Sound Off';
+                bgmBtn.classList.remove('playing');
+            }
+        });
+
+        // 影像定格輸出邏輯
+        const btnExport = document.getElementById('btn-export');
+        const uiControls = document.getElementById('ui-controls');
+
+        btnExport.addEventListener('click', async () => {
+            const originalText = btnExport.textContent;
+            btnExport.textContent = '沖洗中...';
+            
+            try {
+                // 暫時將控制面板隱入黑暗，確保輸出的影像純粹無干擾
+                uiControls.style.opacity = '0';
+                
+                // 給予一點微小的時間讓透明度動畫完成
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const canvas = await html2canvas(document.body, {
+                    scale: 2, // 提升畫質精度
+                    useCORS: true, // 確保你上傳的跨域圖片能被正確繪製
+                    backgroundColor: '#050505',
+                    logging: false
+                });
+                
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = 'Symbiosis_Apartment_Teaser.png';
+                link.href = image;
+                link.click();
+            } catch (error) {
+                console.error("影像定格遭遇了些許阻礙：", error);
+            } finally {
+                // 影像沖洗完畢，喚回控制面板
+                uiControls.style.opacity = '1';
+                btnExport.textContent = originalText;
+            }
+        });
+    </script>
+</body>
+</html>
