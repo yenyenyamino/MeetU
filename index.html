@@ -6,10 +6,23 @@
     <meta name="theme-color" content="#050505">
     <meta name="description" content="寓見 MeetU——七位住戶，各自守著一扇通往故事的門。">
     <title>寓見 MeetU</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: "GenWan";
+            src: url("./assets/fonts/genwan-regular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "GenWan";
+            src: url("./assets/fonts/genwan-semibold.woff") format("woff");
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+        }
+
         :root {
             color-scheme: dark;
             --bg-deep: #050505;
@@ -22,6 +35,8 @@
             --line: rgba(255, 255, 255, 0.13);
             --line-strong: rgba(194, 184, 163, 0.38);
             --ease-cinema: cubic-bezier(0.25, 1, 0.5, 1);
+            --font-serif: "GenWan", "Noto Serif TC", "Songti TC", serif;
+            --font-sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
         }
 
         * {
@@ -42,7 +57,7 @@
                 radial-gradient(circle at 50% -20%, rgba(194, 184, 163, 0.08), transparent 42%),
                 var(--bg-deep);
             color: var(--text-main);
-            font-family: "Noto Serif TC", serif;
+            font-family: var(--font-serif);
         }
 
         body.modal-open {
@@ -86,7 +101,7 @@
 
         .track-name {
             color: rgba(255, 255, 255, 0.28);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.68rem;
             font-weight: 300;
             letter-spacing: 0.18em;
@@ -102,7 +117,7 @@
             border: 0;
             color: rgba(255, 255, 255, 0.42);
             background: transparent;
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.68rem;
             font-weight: 500;
             letter-spacing: 0.2em;
@@ -143,7 +158,7 @@
         .eyebrow {
             margin: 0 0 18px;
             color: rgba(194, 184, 163, 0.56);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.62rem;
             font-weight: 400;
             letter-spacing: 0.5em;
@@ -154,7 +169,7 @@
             margin: 0 0 20px;
             color: rgba(255, 255, 255, 0.96);
             font-size: clamp(2.4rem, 4vw, 3.4rem);
-            font-weight: 900;
+            font-weight: 600;
             letter-spacing: 0.74em;
             line-height: 1.2;
             text-indent: 0.74em;
@@ -271,7 +286,7 @@
             left: 20px;
             margin: 0;
             color: rgba(255, 255, 255, 0.45);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.7rem;
             font-weight: 400;
             letter-spacing: 0.34em;
@@ -335,7 +350,7 @@
             gap: 10px;
             margin-top: 18px;
             color: rgba(194, 184, 163, 0.58);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.58rem;
             letter-spacing: 0.28em;
             text-transform: uppercase;
@@ -442,7 +457,7 @@
             border: 0;
             color: rgba(255, 255, 255, 0.48);
             background: transparent;
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 1.35rem;
             font-weight: 300;
             cursor: pointer;
@@ -459,7 +474,7 @@
         .modal-room {
             margin: 0 0 18px;
             color: rgba(194, 184, 163, 0.58);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.67rem;
             letter-spacing: 0.38em;
         }
@@ -467,10 +482,10 @@
         .modal-name {
             margin: 0;
             color: var(--text-main);
-            font-size: clamp(2rem, 7vw, 3rem);
+            font-size: clamp(1.25rem, 2vw, 1.55rem);
             font-weight: 600;
-            letter-spacing: 0.18em;
-            line-height: 1.35;
+            letter-spacing: 0.22em;
+            line-height: 1.5;
         }
 
         .modal-quote {
@@ -488,7 +503,7 @@
         .action-label {
             margin: 38px 0 14px;
             color: rgba(255, 255, 255, 0.32);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.6rem;
             letter-spacing: 0.34em;
             text-transform: uppercase;
@@ -501,8 +516,7 @@
 
         .platform-link,
         .platform-button {
-            display: grid;
-            grid-template-columns: 72px 1fr auto;
+            display: flex;
             min-height: 58px;
             padding: 0 18px;
             align-items: center;
@@ -525,29 +539,9 @@
             outline: none;
         }
 
-        .platform-code {
-            color: rgba(194, 184, 163, 0.58);
-            font-family: "Noto Sans TC", sans-serif;
-            font-size: 0.58rem;
-            font-weight: 500;
-            letter-spacing: 0.22em;
-        }
-
         .platform-name {
             font-size: 0.86rem;
-            letter-spacing: 0.12em;
-        }
-
-        .platform-arrow {
-            color: rgba(255, 255, 255, 0.28);
-            font-family: "Noto Sans TC", sans-serif;
-            transition: color 220ms ease, transform 220ms ease;
-        }
-
-        .platform-link:hover .platform-arrow,
-        .platform-button:hover .platform-arrow {
-            color: var(--accent-gold);
-            transform: translateX(3px);
+            letter-spacing: 0.16em;
         }
 
         .no-entry {
@@ -581,7 +575,7 @@
         .pin-kicker {
             margin: 0 0 14px;
             color: rgba(194, 184, 163, 0.56);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.6rem;
             letter-spacing: 0.34em;
         }
@@ -618,7 +612,7 @@
             outline: 0;
             color: #fff;
             background: rgba(255, 255, 255, 0.025);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 1.35rem;
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.58em;
@@ -639,7 +633,7 @@
             min-height: 24px;
             margin: 10px 0 14px;
             color: rgba(255, 255, 255, 0.46);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.68rem;
             letter-spacing: 0.06em;
             line-height: 1.7;
@@ -659,7 +653,7 @@
             border: 1px solid rgba(194, 184, 163, 0.36);
             color: var(--text-main);
             background: rgba(194, 184, 163, 0.1);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.7rem;
             font-weight: 500;
             letter-spacing: 0.3em;
@@ -684,7 +678,7 @@
             z-index: 10;
             padding: 0 6vw 34px;
             color: rgba(255, 255, 255, 0.24);
-            font-family: "Noto Sans TC", sans-serif;
+            font-family: var(--font-sans);
             font-size: 0.56rem;
             letter-spacing: 0.28em;
             text-align: center;
@@ -783,10 +777,6 @@
                 overflow-y: auto;
             }
 
-            .platform-link,
-            .platform-button {
-                grid-template-columns: 66px 1fr auto;
-            }
         }
 
         @media (hover: none) {
@@ -855,10 +845,10 @@
             <button class="close-button" id="pin-close" type="button" aria-label="關閉密碼門鎖">×</button>
             <p class="pin-kicker">GEM · PRIVATE ENTRANCE</p>
             <h2 class="pin-title" id="pin-title">住戶門鎖</h2>
-            <p class="pin-copy" id="pin-copy">請輸入六位數通行碼，驗證後將另開 Gem 頁面。</p>
+            <p class="pin-copy" id="pin-copy">請輸入通行碼，驗證後將另開新視窗。</p>
             <form id="pin-form" novalidate>
-                <label for="pin-input" class="eyebrow pin-label">6-DIGIT PIN</label>
-                <input class="pin-input" id="pin-input" type="password" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" aria-describedby="pin-status">
+                <label for="pin-input" class="eyebrow pin-label">PASSCODE</label>
+                <input class="pin-input" id="pin-input" type="password" inputmode="numeric" autocomplete="one-time-code" aria-describedby="pin-status">
                 <p class="pin-status" id="pin-status" aria-live="polite"></p>
                 <button class="pin-submit" id="pin-submit" type="submit">解鎖並前往</button>
             </form>
@@ -965,10 +955,10 @@
         ];
 
         const platformMeta = {
-            gpts: { code: "GPTs", name: "ChatGPT 角色入口" },
-            gem: { code: "GEM", name: "Gemini 私密入口" },
-            heartbeat: { code: "HB", name: "Heartbeat 角色入口" },
-            threads: { code: "SOCIAL", name: "Threads 日常動態" }
+            gpts: { name: "GPT" },
+            gem: { name: "GEM" },
+            heartbeat: { name: "Heartbeat" },
+            threads: { name: "Threads" }
         };
 
         const grid = document.getElementById("apartment-grid");
@@ -1071,20 +1061,11 @@
                 element.rel = "noopener noreferrer";
             }
 
-            const code = document.createElement("span");
-            code.className = "platform-code";
-            code.textContent = meta.code;
-
             const name = document.createElement("span");
             name.className = "platform-name";
             name.textContent = meta.name;
 
-            const arrow = document.createElement("span");
-            arrow.className = "platform-arrow";
-            arrow.setAttribute("aria-hidden", "true");
-            arrow.textContent = entrance.type === "gem" ? "⌁" : "↗";
-
-            element.append(code, name, arrow);
+            element.append(name);
             return element;
         }
 
@@ -1131,7 +1112,7 @@
             if (!resident.gem) return;
             activeResident = resident;
             pinTitle.textContent = `${resident.name}的門鎖`;
-            pinCopy.textContent = `請輸入 ${resident.room} 的六位數通行碼，驗證後將另開 Gem 頁面。`;
+            pinCopy.textContent = `請輸入 ${resident.room} 通行碼，驗證後將另開新視窗。`;
             pinInput.value = "";
             pinStatus.textContent = "";
             pinStatus.className = "pin-status";
@@ -1278,7 +1259,7 @@
         }
 
         pinInput.addEventListener("input", () => {
-            pinInput.value = pinInput.value.replace(/\D/g, "").slice(0, 6);
+            pinInput.value = pinInput.value.replace(/\D/g, "").slice(0, 32);
             if (pinStatus.classList.contains("is-error")) {
                 pinStatus.className = "pin-status";
                 pinStatus.textContent = "";
@@ -1296,9 +1277,9 @@
             }
 
             const pin = pinInput.value;
-            if (!/^\d{6}$/.test(pin)) {
+            if (!/^\d+$/.test(pin)) {
                 pinStatus.className = "pin-status is-error";
-                pinStatus.textContent = "請完整輸入六位數通行碼。";
+                pinStatus.textContent = "請輸入數字通行碼。";
                 pinInput.focus();
                 return;
             }
