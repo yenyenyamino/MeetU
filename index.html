@@ -868,6 +868,22 @@
                 image: "./assets/characters/meguro-akatsuki.png",
                 position: "50% 42%",
                 entrances: [
+                    {
+                        type: "gpts",
+                        label: "Meet U · GPT",
+                        url: "https://chatgpt.com/g/g-6a6f7c3fbd6081919e2d0aa4d25ef412-yu-jian-meet-u"
+                    },
+                    {
+                        type: "gem",
+                        label: "Meet U · GEM",
+                        lockId: "meguro-meet-u",
+                        gem: {
+                            salt: "NMtcpeDqDlM3On/WLfmnuw==",
+                            iv: "swXVIM2j+rtSDQPe",
+                            cipher: "YAsCVrBWJ/ZiYxpAE2/IuqUmAsYv6DwpimwL5T+dnNuqgZYaFvaYUO2sPmQrH+TmGDQc6ELS2DbJcFuUfgeLd28F+sgU5BY15P1+lGC/Idbr5bxwPqOq",
+                            iterations: 210000
+                        }
+                    },
                     { type: "gpts", url: "https://chatgpt.com/g/g-6a070841fd308191b6b25ba6cf692868-mu-hei-xiao-meguro-akatsuki" },
                     { type: "gem" },
                     { type: "heartbeat", url: "https://heartbeat-app.net/characters/4d751e2c-b2b4-4583-8495-ad605b6d2b8f" },
@@ -990,6 +1006,8 @@
         const lockStorageKey = "meetu-gem-locks-v1";
 
         let activeResident = null;
+        let activeGem = null;
+        let activeLockId = null;
         let lastFocusedElement = null;
         let lockTimer = null;
         let fallbackLockState = {};
@@ -1065,7 +1083,7 @@
 
             if (entrance.type === "gem") {
                 element.type = "button";
-                element.addEventListener("click", () => openPinGate(resident));
+                element.addEventListener("click", () => openPinGate(resident, entrance));
             } else {
                 element.href = entrance.url;
                 element.target = "_blank";
@@ -1074,7 +1092,7 @@
 
             const name = document.createElement("span");
             name.className = "platform-name";
-            name.textContent = meta.name;
+            name.textContent = entrance.label || meta.name;
 
             element.append(name);
             return element;
@@ -1119,9 +1137,12 @@
             }, 260);
         }
 
-        function openPinGate(resident) {
-            if (!resident.gem) return;
+        function openPinGate(resident, entrance) {
+            const encryptedGem = entrance.gem || resident.gem;
+            if (!encryptedGem) return;
             activeResident = resident;
+            activeGem = encryptedGem;
+            activeLockId = entrance.lockId || resident.id;
             pinTitle.textContent = `${resident.name}的門鎖`;
             pinCopy.textContent = `請輸入 ${resident.room} 通行碼，驗證後將另開新視窗。`;
             pinInput.value = "";
@@ -1140,6 +1161,8 @@
             window.setTimeout(() => {
                 pinLayer.hidden = true;
                 pinInput.value = "";
+                activeGem = null;
+                activeLockId = null;
                 if (!modal.hidden) modalClose.focus();
             }, 260);
         }
@@ -1189,10 +1212,10 @@
 
         function renderLockState() {
             clearInterval(lockTimer);
-            if (!activeResident) return;
+            if (!activeLockId) return;
 
             const update = () => {
-                const state = getLockState(activeResident.id);
+                const state = getLockState(activeLockId);
                 const remaining = state.lockedUntil - Date.now();
 
                 if (remaining > 0) {
@@ -1279,9 +1302,9 @@
 
         pinForm.addEventListener("submit", async (event) => {
             event.preventDefault();
-            if (!activeResident || !activeResident.gem) return;
+            if (!activeResident || !activeGem || !activeLockId) return;
 
-            const state = getLockState(activeResident.id);
+            const state = getLockState(activeLockId);
             if (state.lockedUntil > Date.now()) {
                 renderLockState();
                 return;
@@ -1302,8 +1325,8 @@
             if (popup) popup.opener = null;
 
             try {
-                const url = await decryptGemUrl(pin, activeResident.gem);
-                clearLockState(activeResident.id);
+                const url = await decryptGemUrl(pin, activeGem);
+                clearLockState(activeLockId);
                 pinStatus.textContent = "門鎖已開啟。";
                 pinInput.value = "";
                 if (popup) {
@@ -1314,7 +1337,7 @@
                 window.setTimeout(closePinGate, 180);
             } catch (error) {
                 if (popup) popup.close();
-                const nextState = getLockState(activeResident.id);
+                const nextState = getLockState(activeLockId);
                 nextState.failures += 1;
                 nextState.lastFailureAt = Date.now();
 
@@ -1323,11 +1346,11 @@
                     nextState.strikes += 1;
                     const lockSeconds = [30, 60, 90][Math.min(nextState.strikes - 1, 2)];
                     nextState.lockedUntil = Date.now() + lockSeconds * 1000;
-                    setLockState(activeResident.id, nextState);
+                    setLockState(activeLockId, nextState);
                     pinInput.value = "";
                     renderLockState();
                 } else {
-                    setLockState(activeResident.id, nextState);
+                    setLockState(activeLockId, nextState);
                     const attemptsLeft = 5 - nextState.failures;
                     pinStatus.className = "pin-status is-error";
                     pinStatus.textContent = `通行碼不正確，還可嘗試 ${attemptsLeft} 次。`;
