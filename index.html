@@ -186,6 +186,37 @@
             line-height: 2.35;
         }
 
+        .common-room-button {
+            display: inline-flex;
+            min-height: 48px;
+            margin-top: 28px;
+            padding: 0 24px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(194, 184, 163, 0.28);
+            color: rgba(255, 255, 255, 0.72);
+            background: rgba(194, 184, 163, 0.035);
+            font-family: var(--font-sans);
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.28em;
+            cursor: pointer;
+            transition:
+                border-color 300ms ease,
+                color 300ms ease,
+                background 300ms ease,
+                transform 500ms var(--ease-cinema);
+        }
+
+        .common-room-button:hover,
+        .common-room-button:focus-visible {
+            border-color: var(--line-strong);
+            color: #fff;
+            background: var(--accent-faint);
+            outline: none;
+            transform: translateY(-2px) scale(1.015);
+        }
+
         .corridor {
             position: relative;
             z-index: 10;
@@ -499,6 +530,7 @@
             font-weight: 300;
             letter-spacing: 0.08em;
             line-height: 2;
+            white-space: pre-line;
         }
 
         .action-label {
@@ -712,6 +744,13 @@
                 letter-spacing: 0.18em;
             }
 
+            .common-room-button {
+                min-height: 46px;
+                margin-top: 24px;
+                padding-inline: 20px;
+                letter-spacing: 0.22em;
+            }
+
             .corridor {
                 width: 100%;
             }
@@ -818,6 +857,9 @@
             七個迥異的靈魂，<br>
             他們共用著這座公寓，各自又有那些故事。
         </p>
+        <button class="common-room-button" id="common-room-button" type="button" aria-haspopup="dialog" aria-controls="resident-modal">
+            寓見 MeetU
+        </button>
     </header>
 
     <main class="corridor" aria-label="寓見住戶長廊">
@@ -859,6 +901,31 @@
     <noscript>請啟用 JavaScript，以使用住戶選單與門鎖功能。</noscript>
 
     <script>
+        const commonRoom = {
+            id: "common-room",
+            room: "ROOM 102 · COMMON ROOM",
+            name: "寓見 MeetU",
+            modalKicker: "寓見 MeetU",
+            modalTitle: "ROOM 102 · COMMON ROOM",
+            quote: "「New tenant？」\n目黑曉抬眼看了你一會，低頭翻找了下，將入住登記表遞了過來。\n「嗯，新來的，今天入住。」\n「歡迎來到寓見。」",
+            entrances: [
+                {
+                    type: "gpts",
+                    url: "https://chatgpt.com/g/g-6a6f7c3fbd6081919e2d0aa4d25ef412-yu-jian-meet-u"
+                },
+                {
+                    type: "gem",
+                    lockId: "meetu-common-room",
+                    gem: {
+                        salt: "psc1AQ7FLNgT8YvtDRqlfQ==",
+                        iv: "rs5BM9YWRdNvCn4r",
+                        cipher: "5N30ZYpSRyO6jbXGVQzHxY+yoDY/sN3L5KW7R19mq8cgz+Q+YcQHGy+fkxS8zMG62fBNUuin/teXkaWd0s8t9VtJUGkZK0Q94x8LgvQ14onldu/X4HuqYL6ZGQ==",
+                        iterations: 210000
+                    }
+                }
+            ]
+        };
+
         const residents = [
             {
                 id: "meguro",
@@ -868,22 +935,6 @@
                 image: "./assets/characters/meguro-akatsuki.png",
                 position: "50% 42%",
                 entrances: [
-                    {
-                        type: "gpts",
-                        label: "Meet U · GPT",
-                        url: "https://chatgpt.com/g/g-6a6f7c3fbd6081919e2d0aa4d25ef412-yu-jian-meet-u"
-                    },
-                    {
-                        type: "gem",
-                        label: "Meet U · GEM",
-                        lockId: "meguro-meet-u",
-                        gem: {
-                            salt: "psc1AQ7FLNgT8YvtDRqlfQ==",
-                            iv: "rs5BM9YWRdNvCn4r",
-                            cipher: "5N30ZYpSRyO6jbXGVQzHxY+yoDY/sN3L5KW7R19mq8cgz+Q+YcQHGy+fkxS8zMG62fBNUuin/teXkaWd0s8t9VtJUGkZK0Q94x8LgvQ14onldu/X4HuqYL6ZGQ==",
-                            iterations: 210000
-                        }
-                    },
                     { type: "gpts", url: "https://chatgpt.com/g/g-6a070841fd308191b6b25ba6cf692868-mu-hei-xiao-meguro-akatsuki" },
                     { type: "gem" },
                     { type: "heartbeat", url: "https://heartbeat-app.net/characters/4d751e2c-b2b4-4583-8495-ad605b6d2b8f" },
@@ -909,8 +960,8 @@
                 id: "fujiwara-rin",
                 room: "ROOM 201",
                 name: "藤原 凜",
-                quote: "「閉上你的嘴，滾開。」",
-                image: "./assets/characters/fujiwara-rin.png",
+                quote: "「太近了，請停在那裡就好。」",
+                image: "./assets/characters/fujiwara-rin-202608.jpg",
                 position: "50% 34%",
                 entrances: []
             },
@@ -919,7 +970,7 @@
                 room: "ROOM 301",
                 name: "Sill",
                 quote: "「……關於這個問題，我會建議你找房東。」",
-                image: "./assets/characters/sill.png",
+                image: "./assets/characters/sill-202608.jpg",
                 position: "50% 42%",
                 entrances: []
             },
@@ -959,7 +1010,7 @@
                 room: "ROOM 403",
                 name: "楠朔",
                 quote: "「嗚呼！這好好吃－－」",
-                image: "./assets/characters/nanshuo.png",
+                image: "./assets/characters/nanshuo-202608.jpg",
                 position: "50% 40%",
                 entrances: [
                     { type: "gpts", url: "https://chatgpt.com/g/g-6a38222a3d6c81919d0f01b8796c7f5c-nan-shuo" },
@@ -982,6 +1033,7 @@
             threads: { name: "Threads" }
         };
 
+        const commonRoomButton = document.getElementById("common-room-button");
         const grid = document.getElementById("apartment-grid");
         const modal = document.getElementById("resident-modal");
         const modalClose = document.getElementById("modal-close");
@@ -1101,8 +1153,8 @@
         function openResident(resident) {
             activeResident = resident;
             lastFocusedElement = document.activeElement;
-            modalRoom.textContent = resident.room;
-            modalName.textContent = resident.name;
+            modalRoom.textContent = resident.modalKicker || resident.room;
+            modalName.textContent = resident.modalTitle || resident.name;
             modalQuote.textContent = resident.quote;
             residentActions.replaceChildren();
 
@@ -1375,6 +1427,7 @@
             }
         }
 
+        commonRoomButton.addEventListener("click", () => openResident(commonRoom));
         modalClose.addEventListener("click", closeResident);
         pinClose.addEventListener("click", closePinGate);
         modal.addEventListener("click", (event) => {
