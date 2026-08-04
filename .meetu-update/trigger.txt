@@ -1,2 +1,0 @@
-Run the staged Room 102 and resident image update.
-Retry with repaired portrait reconstruction and page validation.
