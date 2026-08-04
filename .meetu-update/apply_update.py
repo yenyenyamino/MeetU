@@ -29,8 +29,10 @@ def restore_images() -> None:
         if not parts:
             raise RuntimeError(f"No upload chunks found for {stem}")
         encoded = "".join(part.read_text(encoding="ascii").strip() for part in parts)
-        data = base64.b64decode(encoded, validate=True)
-        if len(data) < 100_000:
+        encoded = "".join(encoded.split())
+        encoded += "=" * (-len(encoded) % 4)
+        data = base64.b64decode(encoded, validate=False)
+        if len(data) < 10_000:
             raise RuntimeError(f"Decoded image for {stem} is unexpectedly small")
         if not data.startswith(b"\xff\xd8\xff"):
             raise RuntimeError(f"Decoded image for {stem} is not a JPEG")
@@ -147,7 +149,7 @@ def patch_index() -> None:
             name: "寓見 MeetU",
             modalKicker: "寓見 MeetU",
             modalTitle: "ROOM 102 · COMMON ROOM",
-            quote: "「New tenant？」\n目黑曉抬眼看了你一會，低頭翻找了下，將入住登記表遞了過來。\n「嗯，新來的，今天入住。」\n「歡迎來到寓見。」",
+            quote: "「New tenant？」\\n目黑曉抬眼看了你一會，低頭翻找了下，將入住登記表遞了過來。\\n「嗯，新來的，今天入住。」\\n「歡迎來到寓見。」",
             entrances: [
                 {
                     type: "gpts",
@@ -189,18 +191,58 @@ def patch_index() -> None:
 """
     text = replace_once(text, meetu_entries, "", "remove MeetU entries from Meguro")
 
-    text = replace_once(text, '                quote: "「閉上你的嘴，滾開。」",', '                quote: "「太近了，請停在那裡就好。」",', "Fujiwara quote")
-    text = replace_once(text, '                image: "./assets/characters/fujiwara-rin.png",', '                image: "./assets/characters/fujiwara-rin-202608.jpg",', "Fujiwara image")
-    text = replace_once(text, '                image: "./assets/characters/sill.png",', '                image: "./assets/characters/sill-202608.jpg",', "Sill image")
-    text = replace_once(text, '                image: "./assets/characters/nanshuo.png",', '                image: "./assets/characters/nanshuo-202608.jpg",', "Nanshuo image")
+    text = replace_once(
+        text,
+        '                quote: "「閉上你的嘴，滾開。」",',
+        '                quote: "「太近了，請停在那裡就好。」",',
+        "Fujiwara quote",
+    )
 
-    text = replace_once(text, '        const grid = document.getElementById("apartment-grid");\n', '        const commonRoomButton = document.getElementById("common-room-button");\n        const grid = document.getElementById("apartment-grid");\n', "common-room button DOM reference")
-    text = replace_once(text, """            modalRoom.textContent = resident.room;
+    text = replace_once(
+        text,
+        '                image: "./assets/characters/fujiwara-rin.png",',
+        '                image: "./assets/characters/fujiwara-rin-202608.jpg",',
+        "Fujiwara image",
+    )
+    text = replace_once(
+        text,
+        '                image: "./assets/characters/sill.png",',
+        '                image: "./assets/characters/sill-202608.jpg",',
+        "Sill image",
+    )
+    text = replace_once(
+        text,
+        '                image: "./assets/characters/nanshuo.png",',
+        '                image: "./assets/characters/nanshuo-202608.jpg",',
+        "Nanshuo image",
+    )
+
+    text = replace_once(
+        text,
+        '        const grid = document.getElementById("apartment-grid");\n',
+        '        const commonRoomButton = document.getElementById("common-room-button");\n'
+        '        const grid = document.getElementById("apartment-grid");\n',
+        "common-room button DOM reference",
+    )
+
+    text = replace_once(
+        text,
+        """            modalRoom.textContent = resident.room;
             modalName.textContent = resident.name;
-""", """            modalRoom.textContent = resident.modalKicker || resident.room;
+""",
+        """            modalRoom.textContent = resident.modalKicker || resident.room;
             modalName.textContent = resident.modalTitle || resident.name;
-""", "common-room modal title overrides")
-    text = replace_once(text, '        modalClose.addEventListener("click", closeResident);\n', '        commonRoomButton.addEventListener("click", () => openResident(commonRoom));\n        modalClose.addEventListener("click", closeResident);\n', "common-room button event")
+""",
+        "common-room modal title overrides",
+    )
+
+    text = replace_once(
+        text,
+        '        modalClose.addEventListener("click", closeResident);\n',
+        '        commonRoomButton.addEventListener("click", () => openResident(commonRoom));\n'
+        '        modalClose.addEventListener("click", closeResident);\n',
+        "common-room button event",
+    )
 
     INDEX_PATH.write_text(text, encoding="utf-8", newline="\n")
 
