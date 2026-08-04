@@ -1,2 +1,2 @@
 Run the staged Room 102 and resident image update.
-Retry with portrait checksum validation.
+Retry with repaired portrait reconstruction and page validation.
