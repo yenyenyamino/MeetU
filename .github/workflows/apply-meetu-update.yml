@@ -1,7 +1,7 @@
 name: Apply MeetU Room 102 update
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: meetu-room-102-update
+  group: meetu-room-102-update-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
@@ -20,9 +20,10 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out pull request branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Apply Room 102 and resident updates
@@ -64,10 +65,12 @@ jobs:
           PY
           git diff --check
 
-      - name: Commit completed update
+      - name: Commit completed update to pull request
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add Room 102 common entrance and refresh residents"
-          git push origin main
+          git push origin "HEAD:${HEAD_BRANCH}"
